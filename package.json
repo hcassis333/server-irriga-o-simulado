@@ -1,0 +1,19 @@
+{
+    "name": "servidor-irrigacao",
+    "version": "1.0.0",
+    "description": "Servidor para controle de irrigação com sensores físicos via GPIO",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js"
+    },
+    "author": "Henrique Cassis",
+    "license": "MIT",
+    "dependencies": {
+      "body-parser": "^1.20.2",
+      "cors": "^2.8.5",
+      "express": "^4.18.2",
+      "node-dht-sensor": "^0.4.3",
+      "onoff": "^6.0.0"
+    }
+  }
+  
