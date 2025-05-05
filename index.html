@@ -1,35 +1,61 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Painel de Irrigação</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Servidor de Irrigação</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 50px; }
+    .dados, .controles { margin-top: 30px; }
+    button { padding: 10px 20px; margin: 5px; font-size: 16px; }
+  </style>
 </head>
 <body>
-  <h1>Sistema de Irrigação</h1>
-  <p><strong>Temperatura:</strong> <span id="temp">--</span> °C</p>
-  <p><strong>Umidade:</strong> <span id="umid">--</span> %</p>
-  <p><strong>Status:</strong> <span id="status">--</span></p>
+  <h1>Servidor de Irrigação</h1>
 
-  <button onclick="acionar('ligar')">Ligar Irrigação</button>
-  <button onclick="acionar('desligar')">Desligar Irrigação</button>
+  <div class="dados">
+    <p><strong>Temperatura:</strong> <span id="temperatura">--</span> °C</p>
+    <p><strong>Umidade:</strong> <span id="umidade">--</span> %</p>
+  </div>
+
+  <div class="controles">
+    <button onclick="ligar()">Ligar Irrigação</button>
+    <button onclick="desligar()">Desligar Irrigação</button>
+  </div>
+
+  <p id="status"></p>
 
   <script>
-    async function atualizar() {
-      const res = await fetch('/api/status');
-      const data = await res.json();
-      document.getElementById('temp').innerText = data.temperatura.toFixed(1);
-      document.getElementById('umid').innerText = data.umidade.toFixed(1);
-      document.getElementById('status').innerText = data.irrigando ? 'Ativada' : 'Desativada';
+    async function atualizarLeitura() {
+      try {
+        const res = await fetch('/leitura');
+        const dados = await res.json();
+        document.getElementById('temperatura').textContent = dados.temperatura;
+        document.getElementById('umidade').textContent = dados.umidade;
+      } catch (err) {
+        console.error('Erro ao obter leitura:', err);
+      }
     }
 
-    async function acionar(acao) {
-      await fetch(`/api/irrigar/${acao}`);
-      atualizar();
+    async function ligar() {
+      await fetch('/rele', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: 'ligar' })
+      });
+      document.getElementById('status').textContent = 'Irrigação ligada';
     }
 
-    setInterval(atualizar, 3000); // Atualiza a cada 3s
-    atualizar(); // Primeira chamada
+    async function desligar() {
+      await fetch('/rele', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: 'desligar' })
+      });
+      document.getElementById('status').textContent = 'Irrigação desligada';
+    }
+
+    setInterval(atualizarLeitura, 5000);
+    atualizarLeitura();
   </script>
 </body>
 </html>
