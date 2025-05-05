@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel de Irrigação</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Sistema de Irrigação</h1>
+  <p><strong>Temperatura:</strong> <span id="temp">--</span> °C</p>
+  <p><strong>Umidade:</strong> <span id="umid">--</span> %</p>
+  <p><strong>Status:</strong> <span id="status">--</span></p>
+
+  <button onclick="acionar('ligar')">Ligar Irrigação</button>
+  <button onclick="acionar('desligar')">Desligar Irrigação</button>
+
+  <script>
+    async function atualizar() {
+      const res = await fetch('/api/status');
+      const data = await res.json();
+      document.getElementById('temp').innerText = data.temperatura.toFixed(1);
+      document.getElementById('umid').innerText = data.umidade.toFixed(1);
+      document.getElementById('status').innerText = data.irrigando ? 'Ativada' : 'Desativada';
+    }
+
+    async function acionar(acao) {
+      await fetch(`/api/irrigar/${acao}`);
+      atualizar();
+    }
+
+    setInterval(atualizar, 3000); // Atualiza a cada 3s
+    atualizar(); // Primeira chamada
+  </script>
+</body>
+</html>
